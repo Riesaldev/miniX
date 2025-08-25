@@ -23,22 +23,25 @@ const Header = () => {
               </li>
             </>
           ) : (*/}
-          <div className="flex justify-around text-xl font-bold text-gray-100">
-            <li>
-              <Link to="/login">Login</Link>
+          <div className="flex justify-between text-gray-100 place-items-baseline px-12">
+            <li className="hover:scale-115 transition-transform duration-200">
+              <Link to="/">
+                <h1 className="text-3xl font-bold">
+                  <span className="text-red-700 font-extrabold text-4xl">/</span>
+                  <span className="text-xl ml-2">Mini</span>
+                  <span className="ml-2 text-4xl text-red-600 italic">X</span>
+                </h1>
+              </Link>
             </li>
-            <li>
-              <Link to="/register">Register</Link>
-            </li>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/messages">Messages</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
+            <section className="flex items-end gap-4">
+              <li className="hover:text-red-600">
+                <Link to="/login">Login</Link>
+              </li>
+              <span>/</span>
+              <li className="hover:text-red-600">
+                <Link to="/register">Register</Link>
+              </li>
+            </section>
           </div>
 
         </ul>
