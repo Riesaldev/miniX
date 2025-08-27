@@ -57,7 +57,7 @@ const Footer = () => {
           </li>
         </ul>
         <section className="contact mt-12">
-          <h1 className="font-bold text-lg uppercase">Subscribe to our newsletter</h1>
+          <h1 className="font-bold uppercase">Subscribe to our newsletter</h1>
           <form className="flex my-8">
             <input className="shadow-[0px_0px_10px_6px_rgba(900,50,80,0.8)] p-3 rounded-s-2xl w-3/4 bg-white  text-black" type="email" placeholder="Enter your email" />
             <button className="bg-black text-white p-3 cursor-pointer rounded-e-2xl w-1/4 hover:bg-red-800 hover:scale-105" type="submit">Join</button>

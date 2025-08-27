@@ -21,6 +21,7 @@ import Blog from './pages/BlogPage.tsx'
 import Documentation from './pages/DocumentationPage.tsx'
 import ApiReference from './pages/ApiReferencePage.tsx'
 import Community from './pages/CommunityPage.tsx'
+import ErrorPage from './pages/errorPage.tsx'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
       <Header />
       <Toaster position='top-right' />
       <Routes>
+        <Route path='*' element={<ErrorPage />} />
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
