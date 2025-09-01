@@ -143,6 +143,7 @@ const LoginForm: React.FC = () => {
           </label>
           <a href="/forgot-password" className="underline hover:text-red-400 mr-4">Forgot password?</a>
         </div>
+        <p className="text-sm text-emerald-100">If you don't have an account, you can <a href="/register" className="underline hover:text-red-400">register here</a>.</p>
 
         <button
           type="submit"
