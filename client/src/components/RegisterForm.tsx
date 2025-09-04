@@ -144,13 +144,9 @@ const RegisterForm = () => {
 
       <p
         className="text-sm text-emerald-100 relative right-6"
-      >
-        If you already have an account, you can
-        <a
-          href="/login" className="underline hover:text-red-400"
-        >
-          login here
-        </a>
+      >If you already have an account, you can <a
+        href="/login" className="underline hover:text-red-400"
+      > login here</a>
         .
       </p>
 
