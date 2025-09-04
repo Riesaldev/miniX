@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bootstrap-icons": "^1.13.1",
+    "js-cookie": "^3.0.5",
     "lucide": "^0.541.0",
     "lucide-react": "^0.541.0",
     "react": "^19.1.1",
@@ -22,6 +23,8 @@
     "@eslint/js": "^9.33.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tailwindcss/vite": "^4.1.12",
+    "@types/js-cookie": "^3.0.6",
+    "@types/prop-types": "^15.7.15",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
