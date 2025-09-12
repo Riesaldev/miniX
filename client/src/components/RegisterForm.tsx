@@ -38,7 +38,7 @@ const RegisterForm = () => {
       // Set loading state to true
       setLoading(true);
       // Make a POST request to the registration endpoint
-      const res = await fetch(`${VITE_API_URL}/api/user/register`, {
+      const res = await fetch(`${VITE_API_URL}/api/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,6 +81,7 @@ const RegisterForm = () => {
       console.error("Registration error:", err);
       // Finally, set loading state to false
     } finally {
+
       setLoading(false);
     }
   }
@@ -91,7 +92,7 @@ const RegisterForm = () => {
   }
   // Render the registration form
   return (
-    <form className="bg-emerald-500/60 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44 " onSubmit={handleSubmit}>
+    <form className="bg-emerald-500/30 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44 " onSubmit={handleSubmit}>
       <h1 className="text-4xl font-bold text-emerald-500 mb-4">Create Account</h1>
       <p className="mt-4 text-lg text-emerald-100 mb-5">Welcome to the Register page!</p>
 
@@ -153,7 +154,7 @@ const RegisterForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="bg-emerald-500 text-emerald-800 py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8"
+        className="bg-emerald-500 text-emerald-900 font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8"
       >
         Register
       </button>

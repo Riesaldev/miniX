@@ -11,51 +11,54 @@ import fileUpload from 'express-fileupload';
 import userRoutes from './src/routes/userRoutes.js';
 import msgRoutes from './src/routes/msgRoutes.js';
 
-//TODO:por hacer
 
 const { UPLOADS_DIR } = process.env;
 
 //creamos el server
 const app = express();
 
+//ruta raiz
+app.get( '/', ( req, res ) => {
+  res.send( '¡Servidor miniX funcionando!' );
+} );
 //middlewares de morgan(peticiones entrantes)
-app.use(morgan('dev'));
+app.use( morgan( 'dev' ) );
 
 //middlewares de cors (conexion cliente/servidor)
-app.use(cors());
+app.use( cors() );
 
 //middleware que permite leer el body en formato json
-app.use(express.json());
+app.use( express.json() );
 
 //middleware que permite leer el body en formato form-data
-app.use(fileUpload());
+app.use( fileUpload() );
 
 //middleware que permite definir el directorio de archivos subidos
-app.use(express.static(UPLOADS_DIR));
+app.use( express.static( UPLOADS_DIR ) );
 
 //middleware que indican donde se encuentran las rutas
-app.use('/api/users', userRoutes);
-app.use('/api/messages', msgRoutes);
+app.use( '/api/users', userRoutes );
+app.use( '/api/messages', msgRoutes );
 
 //middleware de manejo de errores
-app.use ((err, req, res, next) => {
-  console.error(err);
+app.use( ( err, req, res, next ) => {
+  console.error( err );
 
-  res.status (err.httpStatus || 500).send({
+  res.status( err.httpStatus || 500 ).send( {
     status: 'error',
     message: err.message,
-  });
-});
+  } );
+} );
 
 //middleware ruta no encontrada
-app.use ((req, res) => {
-  res.status(404).send({
+app.use( ( req, res ) => {
+  res.status( 404 ).send( {
     status: 'error',
     message: 'Ruta no encontrada',
-  });
-});
+  } );
+} );
 
 //Iniciamos el server
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${process.env.PORT}`);
-});
+app.listen( process.env.PORT, () => {
+  console.log( `Servidor corriendo en el puerto ${ process.env.PORT }` );
+} );
