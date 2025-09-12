@@ -1,29 +1,28 @@
 // Import necessary modules and components
-import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useState, useContext } from "react";
+import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { toast } from "react-hot-toast";
 
 // Access environment variables
 const { VITE_API_URL } = import.meta.env;
-
 // Define the RegisterForm component
 const RegisterForm = () => {
-
+  // Initialize navigation hook
+  const navigate = useNavigate();
   // Access user context
   const userContext = useContext(UserContext);
   // Get the current user from context
   const user = userContext?.user;
 
-  // Initialize navigation
-  const navigate = useNavigate();
-
   // Define state variables for form fields
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formInputs, setFormInputs] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -32,50 +31,40 @@ const RegisterForm = () => {
     // Prevent default form submission behavior
     try {
       e.preventDefault();
-      if (password !== confirmPassword) {
+      if (formInputs.password !== formInputs.confirmPassword) {
         throw new Error("Passwords do not match");
       }
       // Set loading state to true
       setLoading(true);
       // Make a POST request to the registration endpoint
+      // Enviar los campos planos (el backend espera username, email, password en el root del body)
       const res = await fetch(`${VITE_API_URL}/api/users/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          username,
-          email,
-          password,
+          username: formInputs.username.trim(),
+          email: formInputs.email.trim(),
+          password: formInputs.password
         }),
       });
       // Parse the JSON response
       const body = await res.json();
       // Handle non-OK responses throw an error
       if (!res.ok) {
-        throw new Error(body.message || "Registration failed");
+        throw new Error(body.message);
       }
       // Show success toast and navigate to login page
       toast.success(body.message, {
-        id: "register-success",
-        duration: 10000,
+        id: "register",
       });
-      //and reset form fields
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      // Redirect to login page
       navigate("/login");
-
     } catch (err) {
-      // Show error toast with the error message
-      let errorMessage = "An unexpected error occurred";
-      // Check if the error is an instance of Error to get the message
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
       // Display the error message using toast
+      const errorMessage = err instanceof Error ? err.message : String(err);
       toast.error(errorMessage, {
-        id: "register-fail"
+        id: "register"
       });
       // Log the error to the console for debugging
       console.error("Registration error:", err);
@@ -88,7 +77,7 @@ const RegisterForm = () => {
 
   // If the user is already logged in, navigate to the home page
   if (user) {
-    navigate("/");
+    return <Navigate to="/" />;
   }
   // Render the registration form
   return (
@@ -102,7 +91,10 @@ const RegisterForm = () => {
         className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
         placeholder="Username"
         autoComplete="username"
-        onChange={(e) => setUsername(e.target.value)}
+        required
+        minLength={3}
+        maxLength={30}
+        onChange={(e) => setFormInputs({ ...formInputs, username: e.target.value })}
       />
 
       <input
@@ -111,7 +103,8 @@ const RegisterForm = () => {
         className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
         placeholder="Email"
         autoComplete="email"
-        onChange={(e) => setEmail(e.target.value)}
+        required
+        onChange={(e) => setFormInputs({ ...formInputs, email: e.target.value })}
       />
 
       <input
@@ -120,7 +113,9 @@ const RegisterForm = () => {
         className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
         placeholder="Password"
         autoComplete="new-password"
-        onChange={(e) => setPassword(e.target.value)}
+        required
+        minLength={6}
+        onChange={(e) => setFormInputs({ ...formInputs, password: e.target.value })}
       />
 
       <input
@@ -129,7 +124,9 @@ const RegisterForm = () => {
         className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
         placeholder="Confirm Password"
         autoComplete="new-password"
-        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        minLength={6}
+        onChange={(e) => setFormInputs({ ...formInputs, confirmPassword: e.target.value })}
       />
 
       <p

@@ -41,12 +41,12 @@ app.use( '/api/users', userRoutes );
 app.use( '/api/messages', msgRoutes );
 
 //middleware de manejo de errores
-app.use( ( err, req, res, next ) => {
+app.use( ( err, req, res ) => {
   console.error( err );
-
-  res.status( err.httpStatus || 500 ).send( {
+  const statusCode = err.code && Number.isInteger( err.code ) ? err.code : 500;
+  res.status( statusCode ).send( {
     status: 'error',
-    message: err.message,
+    message: err.message || 'Error interno del servidor',
   } );
 } );
 
