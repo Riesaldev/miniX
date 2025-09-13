@@ -49,8 +49,19 @@ const RegisterForm = () => {
           password: formInputs.password
         }),
       });
-      // Parse the JSON response
-      const body = await res.json();
+      // Verificar content-type antes de parsear
+      const contentType = res.headers.get('content-type') || '';
+      type RegisterResponse = {
+        message: string;
+        [key: string]: unknown;
+      };
+      let body: RegisterResponse;
+      if (contentType.includes('application/json')) {
+        body = await res.json() as RegisterResponse;
+      } else {
+        const rawText = await res.text();
+        throw new Error(`Respuesta no JSON (${res.status}): ${rawText.slice(0, 120)}`);
+      }
       // Handle non-OK responses throw an error
       if (!res.ok) {
         throw new Error(body.message);
