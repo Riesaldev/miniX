@@ -1,14 +1,15 @@
 import getPool from '../../db/getPool.js';
 
-const updateAvatarModel = async (userId, avatarName) => {
+const updateAvatarModel = async ( userId, avatarName ) => {
   const pool = await getPool();
 
-  await pool.query(
-    'UPDATE users SET avatar = ? WHERE id = ?',[
-      avatarName,
-      userId
-    ]
+  const [ result ] = await pool.query(
+    'UPDATE users SET avatar = ?, modifiedAt = NOW() WHERE id = ?', [
+    avatarName,
+    userId
+  ]
   );
+  return result; // permitirá comprobar affectedRows
 };
 
 export default updateAvatarModel;

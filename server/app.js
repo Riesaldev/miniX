@@ -40,13 +40,15 @@ app.use( express.static( UPLOADS_DIR ) );
 app.use( '/api/users', userRoutes );
 app.use( '/api/messages', msgRoutes );
 
-//middleware de manejo de errores
-app.use( ( err, req, res ) => {
+//middleware de manejo de errores (debe tener 4 argumentos para que Express lo detecte como tal)
+app.use( ( err, req, res, next ) => {
   console.error( err );
-  const statusCode = err.code && Number.isInteger( err.code ) ? err.code : 500;
-  res.status( statusCode ).send( {
+  const statusCode = ( err.code && Number.isInteger( err.code ) ) ? err.code : 500;
+  // Si ya se enviaron headers, delegar al manejador por defecto
+  if ( res.headersSent ) return next( err );
+  res.status( statusCode ).json( {
     status: 'error',
-    message: err.message || 'Error interno del servidor',
+    message: err.message || 'Error interno del servidor'
   } );
 } );
 
