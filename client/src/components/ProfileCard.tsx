@@ -79,12 +79,6 @@ const ProfileCard = () => {
     }
   };
 
-  const HandleLogOut = () => {
-    ctx?.LogOut();
-    window.location.href = "/";
-    //Todo: Mejorar sin recargar página con mensaje de despedida y opcion de logearse otra vez o volver a home, incluso un modal de confirmacion y una page de despedida
-  }
-
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md w-2/3 mx-auto text-center animate-pulse">
@@ -103,7 +97,7 @@ const ProfileCard = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-2/3 mx-auto text-center">
+    <div className="bg-white p-6 rounded-lg shadow-md w-1/3 mx-auto text-center">
       <header className="mb-4 flex flex-col items-center">
         {!avatar && !tempPreview && (
           <button type="button" onClick={openFileDialog} className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-3xl text-white font-bold cursor-pointer relative group focus:outline-none focus:ring-2 focus:ring-emerald-500">
@@ -123,7 +117,7 @@ const ProfileCard = () => {
             <img
               src={tempPreview || avatar || ''}
               alt="User Avatar"
-              className={`w-24 h-24 rounded-full object-cover cursor-pointer ${uploading ? 'opacity-60' : ''}`}
+              className={`w-24 h-24 border-2 border-emerald-500 shadow-red-600/80 shadow-[0_0_10px_5px_rgba(0,0,0,0)] rounded-full object-cover cursor-pointer ${uploading ? 'opacity-60' : ''}`}
               draggable={false}
             />
             <span className="pointer-events-none select-none absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs text-white transition">
@@ -139,7 +133,7 @@ const ProfileCard = () => {
           onChange={handleFileChange}
           disabled={uploading}
         />
-        <h2 className="text-2xl font-bold mb-1">{`Welcome back ${username}`}</h2>
+        <h2 className="text-2xl font-bold m-4 ">{`Welcome back ${username}`}</h2>
         <p className="text-sm text-gray-500">{email}</p>
       </header>
       <section className="mb-4">
@@ -147,7 +141,6 @@ const ProfileCard = () => {
       </section>
       <footer className="flex justify-center gap-4">
         <button className="bg-emerald-500 text-white px-4 py-2 rounded hover:bg-emerald-600 transition">Editar Perfil</button>
-        <button onClick={HandleLogOut} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Cerrar sesión</button>
       </footer>
     </div>
   );

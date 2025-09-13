@@ -10,6 +10,7 @@ const Header = () => {
 
   const initial = (username?.charAt(0) || 'U').toUpperCase();
 
+  //Todo: Mejorar sin recargar página con mensaje de despedida y opcion de logearse otra vez o volver a home, incluso un modal de confirmacion y una page de despedida
   const Logout = () => {
     ctx?.LogOut();
   }
