@@ -6,15 +6,18 @@ import { createContext, useState, useEffect, type ReactNode } from "react";
 import toast from "react-hot-toast";
 
 const { VITE_API_URL, VITE_AUTH_TOKEN } = import.meta.env;
+// Fallback por si no está definida la variable en .env
+const AUTH_COOKIE_NAME = VITE_AUTH_TOKEN || 'authToken';
 
 interface User {
-  id: string;
-  userName: string;
+  id: string | number;
+  username: string; // backend devuelve 'username'
   email: string;
-  password: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
+  avatar?: string | null;
+  createdAt?: string; // podrían no venir siempre
+  updatedAt?: string;
+  // Campos adicionales tolerados sin tipado estricto
+  [key: string]: unknown; // flexibilidad por si el backend añade algo
 }
 
 const UserContext = createContext<{
@@ -33,11 +36,23 @@ interface UserProviderProps {
 
 const UserProvider = ({ children }: UserProviderProps) => {
 
-  const [authToken, setAuthToken] = useState(
-    cookies.get(VITE_AUTH_TOKEN) || null
-  );
+  const initialToken = () => {
+    const fromCookie = cookies.get(AUTH_COOKIE_NAME);
+    const fromStorage = localStorage.getItem(AUTH_COOKIE_NAME) || null;
+    return fromCookie || fromStorage || null;
+  };
+  const [authToken, setAuthToken] = useState<string | null>(initialToken);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const buildAvatarUrl = (raw?: string | null): string | null => {
+    if (!raw) return null;
+    // Si ya parece URL absoluta o data URI, devolver tal cual
+    if (/^https?:\/\//i.test(raw) || raw.startsWith('data:')) return raw;
+    const base = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || '';
+    // El backend expone UPLOADS_DIR como static root, asumiendo UPLOADS_DIR=uploads
+    return `${base}/${raw.replace(/^\//, '')}`; // raw es filename (e.g.  uuid.jpg )
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,7 +67,19 @@ const UserProvider = ({ children }: UserProviderProps) => {
           throw new Error(body.message);
         }
 
-        setUser(body.data.user);
+        // Normalizar claves para evitar errores si backend cambia mínimamente
+        type ApiUser = Partial<User> & Record<string, unknown>;
+        const apiUser: ApiUser = body.data.user as ApiUser;
+        const normalized: User = {
+          id: (apiUser.id as string | number) ?? '',
+          username: (apiUser.username as string) || (apiUser.userName as string) || (apiUser.name as string) || '',
+          email: (apiUser.email as string) || '',
+          avatar: buildAvatarUrl(apiUser.avatar as string | null),
+          createdAt: apiUser.createdAt as string | undefined,
+          updatedAt: (apiUser.updatedAt as string | undefined) || (apiUser.modifiedAt as string | undefined)
+        };
+
+        setUser(normalized);
       } catch (err: unknown) {
         LogOut();
         const errorMessage =
@@ -67,28 +94,35 @@ const UserProvider = ({ children }: UserProviderProps) => {
       }
     };
 
-    if (authToken) {
-      fetchUser();
+    if (import.meta.env.DEV) {
+      console.log('[UserContext] Cookie name:', AUTH_COOKIE_NAME, 'token inicial:', authToken);
     }
+
+    if (authToken) fetchUser();
+    else setLoading(false);
 
   }, [authToken]);
 
   const login = (token: string) => {
+    if (import.meta.env.DEV) console.log('[UserContext] Guardando token', token);
     setAuthToken(token);
-    cookies.set(VITE_AUTH_TOKEN, token, { expires: 7 });
+    cookies.set(AUTH_COOKIE_NAME, token, { expires: 7 });
+    localStorage.setItem(AUTH_COOKIE_NAME, token);
   };
 
   const LogOut = () => {
+    if (import.meta.env.DEV) console.log('[UserContext] Logout');
     setAuthToken(null);
     setUser(null);
-    cookies.remove(VITE_AUTH_TOKEN);
+    cookies.remove(AUTH_COOKIE_NAME);
+    localStorage.removeItem(AUTH_COOKIE_NAME);
   };
 
   const updateAvatar = (avatar: User["avatar"]) => {
     if (user !== null) {
       setUser({
         ...user,
-        avatar,
+        avatar: buildAvatarUrl(avatar as string | null),
       });
     }
   };
