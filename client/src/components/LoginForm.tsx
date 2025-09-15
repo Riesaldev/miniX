@@ -114,7 +114,7 @@ const LoginForm = () => {
   return (
     <>
       <form
-        className="bg-emerald-500/60 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44"
+        className="bg-emerald-500/30 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44"
         onSubmit={handleSubmit}
         aria-live="polite"
       >

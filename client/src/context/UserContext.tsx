@@ -14,6 +14,7 @@ interface User {
   username: string; // backend devuelve 'username'
   email: string;
   avatar?: string | null;
+  bio?: string | null;
   createdAt?: string; // podrían no venir siempre
   updatedAt?: string;
   // Campos adicionales tolerados sin tipado estricto
@@ -27,6 +28,7 @@ const UserContext = createContext<{
   login: (token: string) => void;
   LogOut: () => void;
   updateAvatar: (avatar: string) => void;
+  updateBio: (bio: string) => void;
 } | null>(null);
 
 
@@ -75,6 +77,7 @@ const UserProvider = ({ children }: UserProviderProps) => {
           username: (apiUser.username as string) || (apiUser.userName as string) || (apiUser.name as string) || '',
           email: (apiUser.email as string) || '',
           avatar: buildAvatarUrl(apiUser.avatar as string | null),
+          bio: (apiUser.bio as string | null) ?? null,
           createdAt: apiUser.createdAt as string | undefined,
           updatedAt: (apiUser.updatedAt as string | undefined) || (apiUser.modifiedAt as string | undefined)
         };
@@ -127,6 +130,15 @@ const UserProvider = ({ children }: UserProviderProps) => {
     }
   };
 
+  const updateBio = (bio: string) => {
+    if (user !== null) {
+      setUser({
+        ...user,
+        bio
+      });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -136,6 +148,7 @@ const UserProvider = ({ children }: UserProviderProps) => {
         login,
         LogOut,
         updateAvatar,
+        updateBio,
       }}
     >
       {children}
