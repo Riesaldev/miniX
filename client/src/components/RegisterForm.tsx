@@ -1,22 +1,22 @@
-// Import necessary modules and components
-import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { Navigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
-import { toast } from "react-hot-toast";
+/**
+ * Formulario de Registro.
+ * Qué: crea un nuevo usuario enviando username, email y password al backend.
+ * Cómo: valida contraseñas coincidentes y parsea respuesta JSON antes de notificar.
+ * Por qué: flujo de alta de usuario esencial para onboarding.
+ */
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+import { toast } from 'react-hot-toast';
 
-// Access environment variables
-const { VITE_API_URL } = import.meta.env;
-// Define the RegisterForm component
+const { VITE_API_URL } = import.meta.env; // Base API URL
+
 const RegisterForm = () => {
-  // Initialize navigation hook
   const navigate = useNavigate();
-  // Access user context
   const userContext = useContext(UserContext);
-  // Get the current user from context
-  const user = userContext?.user;
+  const user = userContext?.user; // Si ya está logado redirigimos (UX consistente)
 
-  // Define state variables for form fields
+  // Estado controlado del formulario (sin controlled components separados).
   const [formInputs, setFormInputs] = useState({
     username: "",
     email: "",
@@ -24,72 +24,53 @@ const RegisterForm = () => {
     confirmPassword: ""
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Indica envío en curso.
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    // Prevent default form submission behavior
     try {
       e.preventDefault();
       if (formInputs.password !== formInputs.confirmPassword) {
-        throw new Error("Passwords do not match");
+        throw new Error('Passwords do not match');
       }
-      // Set loading state to true
+      // Podríamos añadir más validaciones aquí (formato email, fuerza password, username válido).
+      // Envío al backend.
       setLoading(true);
-      // Make a POST request to the registration endpoint
-      // Enviar los campos planos (el backend espera username, email, password en el root del body)
       const res = await fetch(`${VITE_API_URL}/api/users/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formInputs.username.trim(),
           email: formInputs.email.trim(),
           password: formInputs.password
         }),
       });
-      // Verificar content-type antes de parsear
+      // Parseo robusto de respuesta.
       const contentType = res.headers.get('content-type') || '';
-      type RegisterResponse = {
-        message: string;
-        [key: string]: unknown;
-      };
+      type RegisterResponse = { message: string;[key: string]: unknown };
       let body: RegisterResponse;
+      // Manejo de errores HTTP
       if (contentType.includes('application/json')) {
         body = await res.json() as RegisterResponse;
       } else {
         const rawText = await res.text();
         throw new Error(`Respuesta no JSON (${res.status}): ${rawText.slice(0, 120)}`);
       }
-      // Handle non-OK responses throw an error
       if (!res.ok) {
         throw new Error(body.message);
       }
-      // Show success toast and navigate to login page
-      toast.success(body.message, {
-        id: "register",
-      });
-      navigate("/login");
+      toast.success(body.message, { id: 'register' });
+      navigate('/login');
     } catch (err) {
-      // Display the error message using toast
       const errorMessage = err instanceof Error ? err.message : String(err);
-      toast.error(errorMessage, {
-        id: "register"
-      });
-      // Log the error to the console for debugging
-      console.error("Registration error:", err);
-      // Finally, set loading state to false
+      toast.error(errorMessage, { id: 'register' });
+      console.error('Registration error:', err);
     } finally {
-
       setLoading(false);
     }
-  }
+  };
 
-  // If the user is already logged in, navigate to the home page
-  if (user) {
-    return <Navigate to="/" />;
-  }
+  // Redirección temprana si ya está logado (registro no tiene sentido en sesión activa).
+  if (user) return <Navigate to="/" />;
   // Render the registration form
   return (
     <form className="bg-emerald-500/30 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44 " onSubmit={handleSubmit}>
@@ -162,12 +143,12 @@ const RegisterForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="bg-emerald-500 text-emerald-900 font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8"
+        className="bg-emerald-500 text-emerald-900 font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8 disabled:opacity-60"
       >
-        Register
+        {loading ? 'Creando cuenta...' : 'Register'}
       </button>
     </form>
   );
-}
+};
 
 export default RegisterForm;

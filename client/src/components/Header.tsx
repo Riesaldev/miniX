@@ -1,22 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 
+/**
+ * Header
+ * Qué: barra superior con branding y acciones de autenticación.
+ * Cómo: consume UserContext para decidir render de Login/Register vs Avatar + Logout.
+ * Por qué: navegación global persistente en toda la SPA.
+ */
 const Header = () => {
   const ctx = useContext(UserContext);
   const user = ctx?.user;
   const username = user?.username;
   const avatar = user?.avatar as string | undefined | null;
 
+  // Derivación inicial para avatar placeholder.
   const initial = (username?.charAt(0) || 'U').toUpperCase();
 
-  //Todo: Mejorar sin recargar página con mensaje de despedida y opcion de logearse otra vez o volver a home, incluso un modal de confirmacion y una page de despedida
-  const Logout = () => {
-    ctx?.LogOut();
-  }
+  // futuro: implementar modal de confirmación antes de cerrar sesión + feedback UI.
+  const Logout = () => { ctx?.LogOut(); };
 
+  // Subcomponente interno para encapsular badge de avatar.
   const AvatarBadge = () => (
-    <Link to="/profile" className="relative group inline-block w-10 h-10">
+    <Link to="/profile" className="relative group inline-block w-10 h-10" aria-label="Ir al perfil">
       {avatar ? (
         <img
           src={avatar}
@@ -25,6 +31,7 @@ const Header = () => {
           referrerPolicy="no-referrer"
         />
       ) : (
+        // Placeholder con inicial si no hay avatar.
         <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold ring-2 ring-white shadow cursor-pointer transition group-hover:scale-105 select-none">
           {initial}
         </div>
@@ -35,11 +42,11 @@ const Header = () => {
 
   return (
     <header className="bg-emerald-400 w-full p-4">
-      <nav>
+      <nav aria-label="Navegación principal">
         <ul>
           <div className="flex justify-between items-center text-gray-100 px-12">
             <li className="hover:scale-115 transition-transform duration-200">
-              <Link to="/">
+              <Link to="/" aria-label="Ir a inicio">
                 <h1 className="text-3xl font-bold">
                   <span className="text-red-700 font-extrabold text-4xl">/</span>
                   <span className="text-xl ml-2">Mini</span>
@@ -48,19 +55,18 @@ const Header = () => {
               </Link>
             </li>
             <section className="flex items-center gap-5">
+              {/* Render condicional según estado de autenticación. */}
               {user ? (
-                <>
-                  <li className="flex items-center gap-3">
-                    <AvatarBadge />
-                    <button onClick={Logout} className="hover:text-red-600 ">Logout</button>
-                  </li>
-                </>
+                <li className="flex items-center gap-3">
+                  <AvatarBadge />
+                  <button onClick={Logout} className="hover:text-red-600" aria-label="Cerrar sesión">Logout</button>
+                </li>
               ) : (
                 <>
                   <li className="hover:text-red-600">
                     <Link to="/login">Login</Link>
                   </li>
-                  <span>/</span>
+                  <span aria-hidden="true">/</span>
                   <li className="hover:text-red-600">
                     <Link to="/register">Register</Link>
                   </li>
@@ -72,6 +78,6 @@ const Header = () => {
       </nav>
     </header>
   );
-}
+};
 
 export default Header;

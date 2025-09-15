@@ -1,34 +1,36 @@
-//import necessary modules and components
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-// import { Navigate } from "react-router-dom"; // ya no se utiliza la redirección inmediata
-import { useContext } from "react";
-import { UserContext } from "../context/UserContext.tsx";
-import { useNavigate } from "react-router-dom";
+/**
+ * Formulario de Login.
+ * Qué: permite autenticar al usuario mediante email o username + contraseña.
+ * Cómo: hace POST al endpoint /api/users/login y almacena token vía UserContext.
+ * Por qué: establecer sesión para acceder a funcionalidades protegidas.
+ */
+import { useState, useContext } from 'react';
+import { toast } from 'react-hot-toast';
+import { UserContext } from '../context/UserContext.tsx';
+import { useNavigate } from 'react-router-dom';
 
-// Access environment variables
+// Variables de entorno necesarias para endpoint base.
 const { VITE_API_URL } = import.meta.env;
 
 
-// Define the form input types
+// Tipado de los inputs del formulario.
 type FormInputs = {
-  emailOrUsername: string; // el placeholder indica que puede ser email o username; backend espera email actualmente
+  emailOrUsername: string; // Puede ser email o username; backend actual interpreta email si contiene '@'.
   password: string;
-  remember: boolean;
+  remember: boolean; // Futuro: persistencia custom (ahora se usa cookie/localStorage siempre).
 };
 
-// Define the LoginForm component
 const LoginForm = () => {
   const navigate = useNavigate();
 
-  // Define state variables
+  // Estado de carga para evitar envíos múltiples.
   const [isLoading, setIsLoading] = useState(false);
 
-  // Access user context
+  // Contexto de usuario (gestiona token y perfil).
   const userContext = useContext(UserContext);
-  const loginFn = userContext?.login; // función para guardar token
+  const loginFn = userContext?.login; // Setter de token en contexto.
 
-  // Define state for form inputs
+  // Estado controlado del formulario.
   const [formImputs, setFormImputs] = useState<FormInputs>({
     emailOrUsername: "",
     password: "",
@@ -37,27 +39,26 @@ const LoginForm = () => {
 
 
 
-  // Handle form submission
+  // Envío del formulario (async/await + robustez en parseo de respuesta).
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    // Prevent default form submission behavior
     e.preventDefault();
-    // Set loading state to true
     setIsLoading(true);
-
-    //try to connect to the login endpoint
     try {
       const res = await fetch(`${VITE_API_URL}/api/users/login`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        // Backend actual espera email y password; si el usuario escribe algo sin @ podríamos decidir no permitir.
         body: JSON.stringify({
-          email: formImputs.emailOrUsername.trim(),
+          email: formImputs.emailOrUsername.trim(), // backend decide si es email/username.
           password: formImputs.password
         })
       });
+      // Parseo robusto de respuesta (JSON esperado).
+      // Si no es JSON o hay error HTTP, lanzamos con mensaje adecuado.
+      // Esto evita fallos silenciosos o errores de parseo inesperados.
+      // El manejo de errores se centraliza en el catch.
       const contentType = res.headers.get('content-type') || '';
       let body: unknown;
       if (contentType.includes('application/json')) {
@@ -66,8 +67,9 @@ const LoginForm = () => {
         const raw = await res.text();
         throw new Error(`Respuesta no JSON (${res.status}): ${raw.slice(0, 120)}`);
       }
-
-      //if the response is not ok, throw an error
+      // Manejo de errores HTTP (4xx, 5xx) con mensaje del body si existe.
+      // Si la API cambia el formato de error, esto puede necesitar ajustes.
+      // Se asume que body es un objeto con posible campo 'message'.
       if (!res.ok) {
         let msg = 'Login failed';
         if (typeof body === 'object' && body && 'message' in body) {
@@ -76,41 +78,31 @@ const LoginForm = () => {
         }
         throw new Error(msg);
       }
-
-      // If login is successful, update user context and show success toast
+      // Éxito: extraer token y actualizar contexto.
       if (loginFn) {
-        // Intentar extraer token de forma segura
         const maybeObj = body as { data?: { token?: string } };
         const token = maybeObj?.data?.token;
         if (!token) throw new Error('Token no presente en la respuesta');
         if (import.meta.env.DEV) console.log('[LoginForm] token recibido', token);
         loginFn(token);
-        toast.success(`Bienvenido de nuevo`, { duration: 3000 });
+        toast.success('Bienvenido de nuevo', { duration: 3000 });
       }
-      // Reset form fields
-      setFormImputs({
-        emailOrUsername: "",
-        password: "",
-        remember: false
-      });
-      // Redirección controlada externamente (el componente padre puede hacerla al detectar userContext actualizado)
-
-      navigate("/profile", { replace: true });
-      // Evitamos devolver un <Navigate/> dentro de handleSubmit.
-
-      //if not, show an error toast
+      // Limpiar formulario y redirigir a perfil.
+      setFormImputs({ emailOrUsername: '', password: '', remember: false });
+      navigate('/profile', { replace: true });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Login failed";
-      toast.error(errorMessage, { id: "login-error" });
-
-      //finally, set loading state to false
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      toast.error(errorMessage, { id: 'login-error' });
     } finally {
       setIsLoading(false);
-
     }
   };
 
-  //
+  // Renderizado del formulario con accesibilidad básica y estados.
+  // No se usa librería de formularios para mantener simple y didáctico.
+  // Se podría mejorar con validaciones más avanzadas (email válido, fuerza password, etc).
+  // También se podría separar en componentes más pequeños si crece en complejidad.
+  // El diseño es básico y se puede mejorar con CSS/Frameworks según necesidades.
   return (
     <>
       <form
@@ -164,7 +156,7 @@ const LoginForm = () => {
           type="submit"
           className="bg-emerald-500 text-emerald-800 py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8 disabled:opacity-50"
         >
-          {isLoading ? "Iniciando sesión..." : "Login"}
+          {isLoading ? 'Iniciando sesión...' : 'Login'}
         </button>
       </form>
 
