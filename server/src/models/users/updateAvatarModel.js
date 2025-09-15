@@ -1,5 +1,11 @@
 import getPool from '../../db/getPool.js';
 
+/**
+ * Actualiza el nombre de archivo del avatar para un usuario dado.
+ * Qué: reemplaza valor anterior y refresca modifiedAt.
+ * Cómo: simple UPDATE parametrizado.
+ * Por qué: persistir referencia a la imagen procesada en almacenamiento.
+ */
 const updateAvatarModel = async ( userId, avatarName ) => {
   const pool = await getPool();
 
@@ -9,7 +15,7 @@ const updateAvatarModel = async ( userId, avatarName ) => {
     userId
   ]
   );
-  return result; // permitirá comprobar affectedRows
+  return result; // permite comprobar affectedRows para validar éxito.
 };
 
 export default updateAvatarModel;

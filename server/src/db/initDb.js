@@ -2,6 +2,13 @@ import 'dotenv/config';
 
 import getPool from './getPool.js';
 
+/**
+ * Script de inicialización de base de datos.
+ * Qué: recrea el esquema completamente (DROP + CREATE) para entornos de desarrollo/testing.
+ * Cómo: elimina tablas en orden de dependencias y vuelve a crearlas con constraints.
+ * Por qué: asegurar estado limpio reproducible durante desarrollo.
+ * NOTA: No debe ejecutarse en producción porque destruye datos.
+ */
 const initDb = async () => {
   try
   {
@@ -11,6 +18,7 @@ const initDb = async () => {
     await pool.query( `DROP TABLE IF EXISTS likes, messages, users` );
 
     console.log( 'Creando tablas...' );
+    // Tabla de usuarios: almacena credenciales y metadatos de perfil.
     await pool.query( `
       CREATE TABLE IF NOT EXISTS users (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -24,6 +32,7 @@ const initDb = async () => {
       )
     `);
 
+    // Tabla de mensajes: referencia usuario y puede tener imagen.
     await pool.query( `
       CREATE TABLE IF NOT EXISTS messages (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -34,6 +43,7 @@ const initDb = async () => {
       )
     `);
 
+    // Tabla de likes: relación N:M (userId-messageId) controlada con UNIQUE para evitar duplicados.
     await pool.query( `
       CREATE TABLE IF NOT EXISTS likes (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

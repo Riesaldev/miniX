@@ -6,6 +6,12 @@ import removeImgUtil from '../../utils/removeImgUtil.js';
 
 import generateError from '../../utils/generateErrorUtil.js';
 
+/**
+ * Actualización de avatar del usuario.
+ * Qué: reemplaza avatar existente opcionalmente eliminando el anterior y guarda uno nuevo redimensionado.
+ * Cómo: usa express-fileupload (req.files), redimensiona con sharp (saveImgUtil) y persiste filename.
+ * Por qué: mejora experiencia de usuario personalizando perfil; evita acumular archivos huérfanos.
+ */
 const userAvatarController = async ( req, res, next ) => {
   try
   {
@@ -18,11 +24,13 @@ const userAvatarController = async ( req, res, next ) => {
 
     const user = await selectUserByIdModel( req.user.id );
 
+    // Si ya existe un avatar previo lo eliminamos para no crecer indefinidamente en disco.
     if ( user?.avatar )
     {
       await removeImgUtil( user.avatar );
     }
 
+    // Redimensionamos a 100px (asumido cuadrado) para optimizar ancho de banda.
     const avatarName = await saveImgUtil( avatar, 100 );
     const result = await updateAvatarModel( req.user.id, avatarName );
 

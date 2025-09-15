@@ -2,6 +2,12 @@ import updateBioModel from '../../models/users/updateBioModel.js';
 import selectUserByIdModel from '../../models/users/selectUserByIdModel.js';
 import generateError from '../../utils/generateErrorUtil.js';
 
+/**
+ * Actualiza la biografía del usuario autenticado.
+ * Qué: persiste texto corto (máx 255 chars) que personaliza el perfil.
+ * Cómo: valida tipo, elimina espacios extra y controla límites de longitud.
+ * Por qué: previene entradas vacías o demasiado largas que afectarían UI.
+ */
 const updateBioController = async ( req, res, next ) => {
   try
   {
@@ -28,7 +34,7 @@ const updateBioController = async ( req, res, next ) => {
       generateError( 'No se pudo actualizar la bio', 500 );
     }
 
-    // Obtener usuario actualizado
+    // Re-consulta para devolver estado actual consistente.
     const user = await selectUserByIdModel( req.user.id );
 
     res.send( {

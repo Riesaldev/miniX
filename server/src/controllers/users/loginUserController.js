@@ -6,13 +6,18 @@ import selectUserByEmailModel from '../../models/users/selectUserByEmailModel.js
 import selectUserByUsernameModel from '../../models/users/selectUserByUsernameModel.js';
 import generateError from '../../utils/generateErrorUtil.js';
 
+/**
+ * Login de usuario.
+ * Qué: autentica contra email o username y emite JWT.
+ * Cómo: detecta si el identificador contiene '@' para decidir búsqueda por email, si no por username.
+ * Por qué: mejora UX permitiendo un único campo de login (flexibilidad future-proof con 'identifier').
+ */
 const loginUserController = async ( req, res, next ) => {
   try
   {
     let { email, password, username } = req.body;
 
-    // Permitir login con email o username en un solo campo opcional
-    // Si llega un campo 'email' úsalo; si llega 'username' úsalo; si llega 'identifier' (posible extensión futura) también.
+    // Unificación de credenciales: se permite email, username o un campo futuro 'identifier'.
     const identifier = email || username || req.body?.identifier;
 
     if ( !identifier || !password )
@@ -41,6 +46,7 @@ const loginUserController = async ( req, res, next ) => {
       username: user.username
     };
 
+    // Firmamos JWT con expiración para obligar a renovar sesión (7 días mitigando tokens robados antiguos).
     const token = jwt.sign( tokenInfo, process.env.JWT_SECRET, {
       expiresIn: '7d'
     } );

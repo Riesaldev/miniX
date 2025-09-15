@@ -3,34 +3,36 @@ import getPool from '../../db/getPool.js';
 
 import generateError from '../../utils/generateErrorUtil.js';
 
-const insertLike = async (userId, msgId) => {
+/**
+ * Inserta un like si no existe previamente.
+ * Qué: enforce UNIQUE(userId, messageId) a nivel lógico antes de intentar insertar.
+ * Cómo: consulta existencia y luego inserta; retorna número total de likes actualizado.
+ * Por qué: feedback inmediato para UI y prevención de duplicados.
+ */
+const insertLike = async ( userId, messageId ) => {
   const pool = await getPool();
 
-  const [existingLike] = await pool.query(
-    'SELECT id FROM likes WHERE userId = ? AND msgId = ?',
-    [userId, msgId]
+  const [ existingLike ] = await pool.query(
+    'SELECT id FROM likes WHERE userId = ? AND messageId = ?',
+    [ userId, messageId ]
   );
 
-  console.log(existingLike);
-
-  if (existingLike.length > 0) {
-    generateError('You have already liked this message', 409);
+  if ( existingLike.length > 0 )
+  {
+    generateError( 'You have already liked this message', 409 );
   }
 
   await pool.query(
-    'INSERT INTO likes (userId, msgId) VALUES (?, ?)',
-    [userId, msgId]
+    'INSERT INTO likes (userId, messageId) VALUES (?, ?)',
+    [ userId, messageId ]
   );
 
-  console.log('Like inserted successfully');
-
-  const [likes] = await pool.query(
-    'SELECT COUNT(msgId) as totalLikes FROM likes WHERE msgId = ? GROUP BY msgId',
-    [msgId]
+  const [ likes ] = await pool.query(
+    'SELECT COUNT(id) as totalLikes FROM likes WHERE messageId = ? GROUP BY messageId',
+    [ messageId ]
   );
 
-  console.log(likes);
-  return likes[0]?.totalLikes;
+  return likes[ 0 ]?.totalLikes;
 };
 
 export default insertLike;

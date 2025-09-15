@@ -3,30 +3,34 @@ import jwt from 'jsonwebtoken';
 import generateError from '../utils/generateErrorUtil.js';
 
 /**
- * Middleware de autenticación.
- * Espera recibir el token JWT en el header Authorization (sin el prefijo Bearer para simplificar).
- * IMPORTANTE: El login firma con process.env.JWT_SECRET, así que aquí verificamos con la misma.
+ * Middleware de autenticación estricta.
+ * Qué: valida presencia y validez de un token JWT y adjunta su info al objeto req.
+ * Cómo: lee header Authorization (sin prefijo Bearer), verifica con la clave JWT_SECRET.
+ * Por qué: proteger endpoints que requieren identidad (creación/borrado de recursos, perfil privado).
  */
 const authUser = async ( req, res, next ) => {
   try
   {
     const { authorization } = req.headers;
 
+    // Validamos que se proporcione token.
     if ( !authorization )
     {
       generateError( 'No se proporcionó un token', 401 );
     }
 
-    const secret = process.env.JWT_SECRET || process.env.SECRET; // fallback por si aún existe la vieja var
+    // Permitimos fallback a SECRET para compatibilidad retro (si existiera config anterior).
+    const secret = process.env.JWT_SECRET || process.env.SECRET;
     if ( !secret )
     {
-      // Facilita depuración si olvidamos definir la variable en .env
       generateError( 'Falta la variable de entorno JWT_SECRET', 500 );
     }
 
     try
     {
+      // Verificación y extracción de payload.
       const tokenInfo = jwt.verify( authorization, secret );
+      // Anexamos solo la info necesaria (principio de mínima exposición).
       req.user = { id: tokenInfo.id };
       next();
     } catch ( err )
