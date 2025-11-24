@@ -11,7 +11,11 @@ import { toast } from 'react-hot-toast';
 
 const { VITE_API_URL } = import.meta.env; // URL base API para construir ruta avatar.
 
-const ProfileCard = () => {
+type ProfileCardProps = {
+  onOpenAgenda?: () => void;
+};
+
+const ProfileCard = ({ onOpenAgenda }: ProfileCardProps) => {
   // Helper: intenta formatear una fecha si es string/number válido.
   const formatDate = (value: unknown): string => {
     if (typeof value === 'string' || typeof value === 'number') {
@@ -130,6 +134,12 @@ const ProfileCard = () => {
                 className="btn-secondary !rounded-2xl !px-5 !py-2.5 text-sm"
               >
                 Mensajes
+              </button>
+              <button
+                onClick={onOpenAgenda}
+                className="btn-secondary !rounded-2xl !px-5 !py-2.5 text-sm"
+              >
+                Agenda
               </button>
               <button
                 onClick={handleLogout}

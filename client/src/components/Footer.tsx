@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -46,6 +47,7 @@ const socialLinks = [
 ];
 
 const Footer = () => {
+  const [ isNewsletterVisible, setIsNewsletterVisible ] = useState( true );
   return (
     <footer className="mt-auto border-t border-white/5 bg-[#04050f] text-white" aria-label="Pie de página">
       <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col gap-12">
@@ -100,29 +102,39 @@ const Footer = () => {
             ))}
           </div>
 
-          <div className="frosted-card p-6 shadow-lg shadow-[#000000]/40 max-w-sm w-full border-white/10" aria-label="Formulario de suscripción">
-            <p className="text-sm uppercase tracking-[0.35em] text-white/50 mb-3">newsletter</p>
-            <h3 className="text-xl font-semibold mb-3">Historias que elevan tu producto</h3>
-            <p className="text-white/70 text-sm mb-6">
-              Recibe estudios de caso, patrones de producto y micro-animaciones seleccionadas por el equipo de diseño de MiniX.
-            </p>
-            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-              <label className="text-xs uppercase tracking-[0.35em] text-white/40 block">correo</label>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  required
-                  placeholder="you@studio.com"
-                  className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
-                  aria-label="Correo para suscripción"
-                />
-                <button type="submit" className="btn-primary w-full sm:w-auto">
-                  Join
-                </button>
-              </div>
-            </form>
-            <p className="text-xs text-white/40 mt-4">Sin spam. Cancela cuando quieras.</p>
-          </div>
+          {isNewsletterVisible && (
+            <div className="relative frosted-card p-6 shadow-lg shadow-[#000000]/40 max-w-sm w-full border-white/10" aria-label="Formulario de suscripción">
+              <button
+                type="button"
+                className="absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-[#05060f]/70 text-white/70 hover:text-white hover:border-white/40 transition"
+                aria-label="Cerrar newsletter"
+                onClick={() => setIsNewsletterVisible( false )}
+              >
+                <i className="bi bi-x-lg" />
+              </button>
+              <p className="text-sm uppercase tracking-[0.35em] text-white/50 mb-3">newsletter</p>
+              <h3 className="text-xl font-semibold mb-3">Historias que elevan tu producto</h3>
+              <p className="text-white/70 text-sm mb-6">
+                Recibe estudios de caso, patrones de producto y micro-animaciones seleccionadas por el equipo de diseño de MiniX.
+              </p>
+              <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                <label className="text-xs uppercase tracking-[0.35em] text-white/40 block">correo</label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="email"
+                    required
+                    placeholder="you@studio.com"
+                    className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+                    aria-label="Correo para suscripción"
+                  />
+                  <button type="submit" className="btn-primary w-full sm:w-auto">
+                    Join
+                  </button>
+                </div>
+              </form>
+              <p className="text-xs text-white/40 mt-4">Sin spam. Cancela cuando quieras.</p>
+            </div>
+          )}
         </section>
 
         <section className="flex flex-col gap-4 border-t border-white/5 pt-6 md:flex-row md:items-center md:justify-between">

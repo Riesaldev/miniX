@@ -8,11 +8,13 @@ import loginUserController from './loginUserController.js';
 import getPrivateUserProfileController from './getPrivateUserProfileController.js';
 import userAvatarController from './UserAvatarController.js';
 import updateBioController from './updateBioController.js';
+import searchUsersController from './searchUsersController.js';
 
 export {
   registerUserController,
   loginUserController,
   getPrivateUserProfileController,
   userAvatarController,
-  updateBioController
+  updateBioController,
+  searchUsersController
 };

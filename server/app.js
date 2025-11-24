@@ -13,6 +13,7 @@ import 'dotenv/config';
  * morgan -> logging de peticiones entrantes para depurar y medir.
  * express-fileupload -> parsea multipart/form-data para subir imágenes (avatar, imágenes de mensajes).
  */
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -26,6 +27,7 @@ import fileUpload from 'express-fileupload';
  */
 import userRoutes from './src/routes/userRoutes.js';
 import msgRoutes from './src/routes/msgRoutes.js';
+import initChatServer from './src/ws/chatServer.js';
 
 // Extraemos directorio de uploads desde variables de entorno (flexible entre entornos).
 const { UPLOADS_DIR } = process.env;
@@ -79,7 +81,10 @@ app.use( fileUpload() );
  * Cómo: express.static sobre el path configurado en .env.
  * Por qué: permite que el cliente consuma imágenes sin endpoint adicional.
  */
-app.use( express.static( UPLOADS_DIR ) );
+if ( UPLOADS_DIR )
+{
+  app.use( express.static( UPLOADS_DIR ) );
+}
 
 /**
  * Montaje de routers de dominio.
@@ -122,6 +127,9 @@ app.use( ( req, res ) => {
  * Qué: escucha en el puerto configurado.
  * Por qué: punto de entrada principal para recibir tráfico.
  */
-app.listen( process.env.PORT, () => {
+const server = http.createServer( app );
+initChatServer( server );
+
+server.listen( process.env.PORT, () => {
   console.log( `Servidor corriendo en el puerto ${ process.env.PORT }` );
 } );

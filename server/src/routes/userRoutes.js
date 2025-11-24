@@ -14,7 +14,15 @@ import {
   getPrivateUserProfileController,
   userAvatarController,
   updateBioController,
+  searchUsersController,
 } from '../controllers/users/index.js';
+import {
+  requestContactController,
+  acceptContactController,
+  listContactsController,
+  listPrivateMessagesController,
+  sendPrivateMessageController,
+} from '../controllers/contacts/index.js';
 
 const router = express.Router();
 
@@ -57,5 +65,20 @@ router.put( '/avatar', authUser, userAvatarController );
  * Por qué: permitir información pública adicional.
  */
 router.put( '/bio', authUser, updateBioController );
+
+/**
+ * GET /search
+ * Qué: busca usuarios por username/email parcial.
+ */
+router.get( '/search', authUser, searchUsersController );
+
+/**
+ * Agenda y chat privado.
+ */
+router.get( '/contacts', authUser, listContactsController );
+router.post( '/contacts/request', authUser, requestContactController );
+router.post( '/contacts/:userId/accept', authUser, acceptContactController );
+router.get( '/contacts/:userId/messages', authUser, listPrivateMessagesController );
+router.post( '/contacts/:userId/messages', authUser, sendPrivateMessageController );
 
 export default router;
