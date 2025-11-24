@@ -5,6 +5,7 @@
  * Por qué: Centraliza edición inline de atributos personales sin navegar a otra vista.
  */
 import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import { toast } from 'react-hot-toast';
 
@@ -19,6 +20,7 @@ const ProfileCard = () => {
     }
     return '—';
   };
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
   const user = userContext?.user;
   const LogOut = userContext?.LogOut; // Ojo: en el contexto el método se llama 'LogOut'.
@@ -29,6 +31,13 @@ const ProfileCard = () => {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioLoading, setBioLoading] = useState(false);
   const [avatarLoading, setAvatarLoading] = useState(false);
+
+  // Maneja el cierre de sesión y redirige a login.
+  const handleLogout = () => {
+    LogOut?.();
+    navigate('/login', { replace: true });
+    toast.success('Sesión cerrada correctamente');
+  };
 
   // Subida de avatar: validamos tipo y tamaño antes de invocar a updateAvatar (que gestiona fetch + estado global).
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,87 +94,140 @@ const ProfileCard = () => {
   if (!user) return null; // No render sin sesión (componente pensado para vista privada).
 
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className="p-6 flex flex-col gap-6 max-w-2xl mx-auto font-sans">
       {/* Cabecera: avatar + identidad + logout */}
-      <section className="flex items-center gap-4">
-        <div className="relative w-24 h-24">
-          <img
-            src={user.avatarFilename ? `${VITE_API_URL}/uploads/${user.avatarFilename}` : '/avatar.jpg'}
-            alt={`Avatar de ${user.username}`}
-            className="w-24 h-24 rounded-full object-cover border-2 border-emerald-600" />
-          <label className="absolute bottom-0 right-0 bg-black/60 p-1 rounded-full cursor-pointer hover:bg-black/80" title="Actualizar avatar">
-            <input onChange={handleFileChange} type="file" className="hidden" accept="image/*" />
-            {avatarLoading ? (
-              <span className="text-xs text-white">...</span>
-            ) : (
-              <i className="bi bi-camera-fill text-white"></i>
-            )}
-          </label>
+      <section className="bg-white/50 backdrop-blur-sm p-8 sm:p-10 rounded-xl border border-white/60 shadow-md font-sans">
+        <div className="flex items-start gap-6 sm:gap-8 flex-wrap sm:flex-nowrap">
+          <div className="relative flex-shrink-0">
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44">
+              <img
+                src={user.avatarFilename ? `${VITE_API_URL}/uploads/${user.avatarFilename}` : '/avatar.jpg'}
+                alt={`Avatar de ${user.username}`}
+                className="w-full h-full rounded-full object-cover border-4 border-emerald-500 shadow-lg" />
+              <label 
+                className="absolute bottom-0 right-0 bg-emerald-600 hover:bg-emerald-700 p-2.5 sm:p-3 rounded-full cursor-pointer transition-colors duration-200 shadow-md hover:shadow-lg active:scale-95" 
+                title="Actualizar avatar"
+              >
+                <input onChange={handleFileChange} type="file" className="hidden" accept="image/*" />
+                {avatarLoading ? (
+                  <span className="block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <i className="bi bi-camera-fill text-white text-base sm:text-lg"></i>
+                )}
+              </label>
+            </div>
+          </div>
+          <div className="flex-1 min-w-0 font-sans">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 break-words font-serif">
+              {user.username}
+            </h2>
+            <p className="text-lg sm:text-xl text-white mb-5 break-words">
+              {user.email}
+            </p>
+            <div className="flex gap-3 flex-wrap">
+              <button
+                onClick={() => navigate('/messages')}
+                className="bg-emerald-600 cursor-pointer text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 text-base font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                Mensajes
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 cursor-pointer text-white px-5 py-2.5 rounded-lg hover:bg-transparent hover:text-red-600 hover:shadow-none active:bg-red-600 active:text-white text-base font-medium transition-all duration-200 shadow-sm"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-emerald-700">{user.username}</h2>
-          <p className="text-sm text-emerald-950/70">{user.email}</p>
-        </div>
-        <button
-          onClick={LogOut}
-          className="bg-rose-600/80 text-white px-3 py-1 rounded-md hover:bg-rose-700 text-sm"
-        >
-          Logout
-        </button>
       </section>
 
       {/* BIO editable inline */}
-      <section className="bg-white/40 backdrop-blur-sm p-4 rounded-lg border border-white/50 shadow-sm">
-        <header className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-emerald-900">Biografía</h3>
+      <section className="bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-white/60 shadow-md font-sans">
+        <header className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-gray-900 font-serif">Biografía</h3>
           {!isEditingBio && (
             <button
               onClick={() => setIsEditingBio(true)}
-              className="text-xs text-emerald-700 hover:underline"
-            >Editar</button>
+              className="text-base text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200 px-2 py-1 rounded hover:bg-emerald-50 cursor-pointer"
+            >
+              Editar
+            </button>
           )}
         </header>
         {isEditingBio ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <textarea
               value={bioValue}
               onChange={e => setBioValue(e.target.value)}
-              className="w-full p-2 text-sm rounded-md bg-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[100px]"
+              className="w-full p-3 text-base sm:text-lg rounded-lg bg-white/90 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 min-h-[120px] resize-y transition-all duration-200 text-gray-900 placeholder:text-gray-400"
               maxLength={160}
               placeholder="Cuenta algo sobre ti (máx 160 caracteres)"
             />
-            <div className="flex items-center justify-between text-xs text-emerald-900/70">
-              <span>{bioValue.length}/160</span>
+            <div className="flex items-center justify-between text-base text-white">
+              <span className="font-medium">{bioValue.length}/160 caracteres</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setIsEditingBio(false)}
                   disabled={bioLoading}
-                  className="px-3 py-1 rounded-md bg-neutral-300/60 hover:bg-neutral-300 text-neutral-900"
-                >Cancelar</button>
+                  className="px-4 py-2 rounded-lg bg-neutral-200 hover:bg-neutral-300 text-neutral-800 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                >
+                  Cancelar
+                </button>
                 <button
                   onClick={submitBio}
                   disabled={bioLoading}
-                  className="px-3 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
-                >Guardar</button>
+                  className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 font-medium transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md text-base"
+                >
+                  {bioLoading ? 'Guardando...' : 'Guardar'}
+                </button>
               </div>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-emerald-950/90 min-h-[60px] whitespace-pre-line">
-            {user.bio || <span className="text-emerald-950/40">Sin bio todavía.</span>}
-          </p>
+          <div className="min-h-[80px]">
+            <p className="text-base sm:text-lg text-white leading-relaxed whitespace-pre-line">
+              {user.bio || (
+                <span className="text-white italic">Sin biografía todavía. Haz clic en Editar para agregar una.</span>
+              )}
+            </p>
+          </div>
         )}
       </section>
 
       {/* Datos técnicos: útil para debugging rápido o soporte. */}
-      <section className="bg-white/40 backdrop-blur-sm p-4 rounded-lg border border-white/50 shadow-sm">
-        <h3 className="font-semibold text-emerald-900 mb-2">Datos técnicos</h3>
-        <ul className="text-xs text-emerald-800 grid gap-1">
-          <li><span className="font-semibold">ID:</span> {user.id}</li>
-          <li><span className="font-semibold">Creado:</span> {formatDate(user.createdAt)}</li>
-          <li><span className="font-semibold">Último login:</span> {formatDate((user as unknown as { lastAuthAt?: unknown }).lastAuthAt)}</li>
-          <li><span className="font-semibold">Tiene avatar:</span> {user.avatarFilename ? 'Sí' : 'No'}</li>
-        </ul>
+      <section className="bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-white/60 shadow-md font-sans">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4 font-serif">Datos técnicos</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">ID de usuario</span>
+            <span className="text-base text-white font-mono break-all">{user.id}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Cuenta creada</span>
+            <span className="text-base text-white">{formatDate(user.createdAt)}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Último acceso</span>
+            <span className="text-base text-white">{formatDate((user as unknown as { lastAuthAt?: unknown }).lastAuthAt)}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Avatar</span>
+            <span className="text-base text-white">
+              {user.avatarFilename ? (
+                <span className="inline-flex items-center gap-1 text-white">
+                  <i className="bi bi-check-circle-fill text-emerald-600"></i>
+                  Configurado
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-white">
+                  <i className="bi bi-x-circle-fill"></i>
+                  No configurado
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
       </section>
     </div>
   );
