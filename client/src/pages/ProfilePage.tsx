@@ -1,17 +1,17 @@
 import ProfileCard from "../components/ProfileCard";
 
-
 const Profile = () => {
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-emerald-500 z-0">
-      <div className="bg-[url('/bg-profile.jpg')] bg-cover bg-no-repeat h-full w-full opacity-80 flex-grow">
-        <div className="bg-emerald-500/10 backdrop-blur-xs min-h-screen flex items-center justify-center p-4">
-          <ProfileCard />
-        </div>
-
+    <section className="relative flex-1 overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(127,90,240,0.15),_transparent_45%)]" />
+        <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_right,_rgba(0,225,217,0.22),_transparent_55%)] blur-3xl opacity-70" />
       </div>
-    </div>
+      <div className="relative max-w-5xl mx-auto px-6 py-16">
+        <ProfileCard />
+      </div>
+    </section>
   );
-}
+};
 
 export default Profile;

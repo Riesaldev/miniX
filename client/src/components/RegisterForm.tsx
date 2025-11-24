@@ -4,7 +4,7 @@
  * Cómo: valida contraseñas coincidentes y parsea respuesta JSON antes de notificar.
  * Por qué: flujo de alta de usuario esencial para onboarding.
  */
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { toast } from 'react-hot-toast';
@@ -73,80 +73,94 @@ const RegisterForm = () => {
   if (user) return <Navigate to="/" />;
   // Render the registration form
   return (
-    <form className="bg-emerald-500/30 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44 " onSubmit={handleSubmit}>
-      <h1 className="text-4xl font-bold text-emerald-500 mb-4">Create Account</h1>
-      <p className="mt-4 text-lg text-emerald-100 mb-5">Welcome to the Register page!</p>
+    <form className="frosted-card w-full max-w-md p-8 text-left space-y-5 border border-white/10" onSubmit={handleSubmit}>
+      <header className="space-y-2">
+        <p className="text-xs uppercase tracking-[0.4em] text-white/50">crear cuenta</p>
+        <h1 className="text-3xl font-semibold">Construye tu estudio social.</h1>
+        <p className="text-sm text-white/60">Activa MiniX para tu equipo y obtén acceso anticipado a las nuevas micro-animaciones.</p>
+      </header>
 
-      <input
-        type="text"
-        name="username"
-        className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
-        placeholder="Username"
-        autoComplete="username"
-        required
-        minLength={3}
-        maxLength={30}
-        onChange={(e) => setFormInputs({ ...formInputs, username: e.target.value })}
-      />
+      <label className="flex flex-col gap-2 text-sm text-white/70">
+        Nombre de usuario
+        <input
+          type="text"
+          name="username"
+          className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+          placeholder="minix.studio"
+          autoComplete="username"
+          required
+          minLength={3}
+          maxLength={30}
+          onChange={(e) => setFormInputs({ ...formInputs, username: e.target.value })}
+        />
+      </label>
 
-      <input
-        type="email"
-        name="email"
-        className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
-        placeholder="Email"
-        autoComplete="email"
-        required
-        onChange={(e) => setFormInputs({ ...formInputs, email: e.target.value })}
-      />
+      <label className="flex flex-col gap-2 text-sm text-white/70">
+        Correo
+        <input
+          type="email"
+          name="email"
+          className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+          placeholder="equipo@minix.com"
+          autoComplete="email"
+          required
+          onChange={(e) => setFormInputs({ ...formInputs, email: e.target.value })}
+        />
+      </label>
 
-      <input
-        type="password"
-        name="password"
-        className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
-        placeholder="Password"
-        autoComplete="new-password"
-        required
-        minLength={6}
-        onChange={(e) => setFormInputs({ ...formInputs, password: e.target.value })}
-      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="flex flex-col gap-2 text-sm text-white/70">
+          Contraseña
+          <input
+            type="password"
+            name="password"
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            required
+            minLength={6}
+            onChange={(e) => setFormInputs({ ...formInputs, password: e.target.value })}
+          />
+        </label>
 
-      <input
-        type="password"
-        name="confirmPassword"
-        className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
-        placeholder="Confirm Password"
-        autoComplete="new-password"
-        required
-        minLength={6}
-        onChange={(e) => setFormInputs({ ...formInputs, confirmPassword: e.target.value })}
-      />
+        <label className="flex flex-col gap-2 text-sm text-white/70">
+          Confirmar contraseña
+          <input
+            type="password"
+            name="confirmPassword"
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            required
+            minLength={6}
+            onChange={(e) => setFormInputs({ ...formInputs, confirmPassword: e.target.value })}
+          />
+        </label>
+      </div>
 
-      <p
-        className="text-sm text-emerald-100 mb-5 relative right-18"
-      >
-        I agree to the <a
-          href="/terms"
-          className="underline hover:text-red-400 left-11"
-        >
-          terms and conditions
-        </a>
-      </p>
-
-      <p
-        className="text-sm text-emerald-100 relative right-6"
-      >If you already have an account, you can <a
-        href="/login" className="underline hover:text-red-400"
-      > login here</a>
+      <p className="text-xs text-white/50">
+        Al continuar aceptas los{' '}
+        <Link to="/terms" className="text-[#7f5af0] hover:text-white transition-colors">
+          términos y condiciones
+        </Link>
         .
       </p>
 
       <button
         type="submit"
         disabled={loading}
-        className="bg-emerald-500 text-emerald-900 font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8 disabled:opacity-60"
+        className="btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {loading ? 'Creando cuenta...' : 'Register'}
+        {loading ? 'Creando cuenta...' : 'Crear cuenta'}
       </button>
+
+      <p className="text-sm text-white/60 text-center">
+        ¿Ya tienes sesión?{' '}
+        <Link to="/login" className="text-[#00e1d9] hover:text-white transition-colors">
+          Continúa aquí
+        </Link>
+        .
+      </p>
     </form>
   );
 };

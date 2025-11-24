@@ -7,7 +7,7 @@
 import { useState, useContext } from 'react';
 import { toast } from 'react-hot-toast';
 import { UserContext } from '../context/UserContext.tsx';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Variables de entorno necesarias para endpoint base.
 const { VITE_API_URL } = import.meta.env;
@@ -106,58 +106,72 @@ const LoginForm = () => {
   return (
     <>
       <form
-        className="bg-emerald-500/30 backdrop-blur-md p-8 rounded-4xl text-center w-3/4 md:w-1/2 lg:w-1/3 z-10 relative -top-44"
+        className="frosted-card w-full max-w-md p-8 text-left space-y-6 border border-white/10"
         onSubmit={handleSubmit}
         aria-live="polite"
       >
-        <h1 className="text-4xl font-bold text-emerald-500 mb-4">Login</h1>
-        <p className="mt-4 text-lg text-emerald-100 mb-5">Welcome back! Please log in to your account.</p>
+        <header className="space-y-2">
+          <p className="text-xs uppercase tracking-[0.4em] text-white/50">bienvenido</p>
+          <h1 className="text-3xl font-semibold">Entra a la nueva capa de MiniX.</h1>
+          <p className="text-sm text-white/60">
+            Accede a tus mensajes sincronizados, comunidades privadas y analíticas en tiempo real.
+          </p>
+        </header>
 
-        <label className="sr-only" htmlFor="username">Usuario</label>
-        <input
-          id="email"
-          type="text"
-          className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-4"
-          placeholder="Username or Email"
-          autoComplete="username"
-          value={formImputs.emailOrUsername}
-          onChange={(e) => setFormImputs({ ...formImputs, emailOrUsername: e.target.value })}
-          required
-          autoFocus
-        />
+        <label className="flex flex-col gap-2 text-sm text-white/70">
+          Usuario o correo
+          <input
+            id="email"
+            type="text"
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+            placeholder="username o email"
+            autoComplete="username"
+            value={formImputs.emailOrUsername}
+            onChange={(e) => setFormImputs({ ...formImputs, emailOrUsername: e.target.value })}
+            required
+            autoFocus
+          />
+        </label>
 
-        <label className="sr-only" htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          className="border text-emerald-50 border-emerald-300 p-2 rounded-lg w-2/3 mb-8"
-          placeholder="Password"
-          autoComplete="current-password"
-          value={formImputs.password}
-          onChange={(e) => setFormImputs({ ...formImputs, password: e.target.value })}
-          required
-        />
+        <label className="flex flex-col gap-2 text-sm text-white/70">
+          Contraseña
+          <input
+            id="password"
+            type="password"
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 focus:border-[#7f5af0] focus:ring-2 focus:ring-[#7f5af0]/40 transition"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            value={formImputs.password}
+            onChange={(e) => setFormImputs({ ...formImputs, password: e.target.value })}
+            required
+          />
+        </label>
 
-        <div className="flex justify-between text-sm text-emerald-100 mb-5 w-2/3 mx-auto">
-          <label className="flex items-center">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-white/60">
+          <label className="inline-flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
-              className="mr-2"
+              checked={formImputs.remember}
+              onChange={() => setFormImputs((prev) => ({ ...prev, remember: !prev.remember }))}
+              className="size-4 rounded border border-white/20 accent-[#7f5af0]"
             />
-            Remember me
+            Recuérdame
           </label>
-          <a href="/forgot-password" className="underline hover:text-red-400 mr-4">Forgot password?</a>
+          <Link to="/forgot-password" className="link-underline text-[#7f5af0]">
+            ¿Olvidaste tu contraseña?
+          </Link>
         </div>
-        <p className="text-sm text-emerald-100">If you don't have an account, you can <a href="/register" className="underline hover:text-red-400">register here</a>.</p>
 
-        <button
-          onClick={() => setFormImputs({ ...formImputs, remember: !formImputs.remember })}
-          disabled={isLoading}
-          type="submit"
-          className="bg-emerald-500 text-emerald-800 py-2 px-4 rounded-lg hover:bg-emerald-700 hover:text-white cursor-pointer mt-8 disabled:opacity-50"
-        >
-          {isLoading ? 'Iniciando sesión...' : 'Login'}
+        <button disabled={isLoading} type="submit" className="btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed">
+          {isLoading ? 'Iniciando sesión...' : 'Acceder'}
         </button>
+
+        <p className="text-sm text-white/60 text-center">
+          ¿Nuevo en MiniX?{' '}
+          <Link to="/register" className="text-[#00e1d9] hover:text-white transition-colors">
+            Activa tu cuenta
+          </Link>
+        </p>
       </form>
 
     </>

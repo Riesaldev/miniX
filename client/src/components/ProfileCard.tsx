@@ -94,9 +94,9 @@ const ProfileCard = () => {
   if (!user) return null; // No render sin sesión (componente pensado para vista privada).
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-2xl mx-auto font-sans">
+    <div className="p-6 flex flex-col gap-6 max-w-2xl mx-auto text-white">
       {/* Cabecera: avatar + identidad + logout */}
-      <section className="bg-white/50 backdrop-blur-sm p-8 sm:p-10 rounded-xl border border-white/60 shadow-md font-sans">
+      <section className="glass-panel p-8 sm:p-10 border-white/10">
         <div className="flex items-start gap-6 sm:gap-8 flex-wrap sm:flex-nowrap">
           <div className="relative flex-shrink-0">
             <div className="relative w-36 h-36 sm:w-44 sm:h-44">
@@ -118,22 +118,22 @@ const ProfileCard = () => {
             </div>
           </div>
           <div className="flex-1 min-w-0 font-sans">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 break-words font-serif">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-2 break-words">
               {user.username}
             </h2>
-            <p className="text-lg sm:text-xl text-white mb-5 break-words">
+            <p className="text-base sm:text-lg text-white/70 mb-5 break-words">
               {user.email}
             </p>
             <div className="flex gap-3 flex-wrap">
               <button
                 onClick={() => navigate('/messages')}
-                className="bg-emerald-600 cursor-pointer text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 text-base font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
+                className="btn-secondary !rounded-2xl !px-5 !py-2.5 text-sm"
               >
                 Mensajes
               </button>
               <button
                 onClick={handleLogout}
-                className="bg-red-600 cursor-pointer text-white px-5 py-2.5 rounded-lg hover:bg-transparent hover:text-red-600 hover:shadow-none active:bg-red-600 active:text-white text-base font-medium transition-all duration-200 shadow-sm"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-[#05060f] bg-gradient-to-r from-[#ff6b81] to-[#ff9068] shadow-[0_12px_25px_rgba(255,107,129,0.35)] hover:-translate-y-0.5 transition-transform duration-200"
               >
                 Cerrar Sesión
               </button>
@@ -143,9 +143,9 @@ const ProfileCard = () => {
       </section>
 
       {/* BIO editable inline */}
-      <section className="bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-white/60 shadow-md font-sans">
+      <section className="glass-panel p-6 border-white/10">
         <header className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold text-gray-900 font-serif">Biografía</h3>
+          <h3 className="text-xl font-semibold text-white">Biografía</h3>
           {!isEditingBio && (
             <button
               onClick={() => setIsEditingBio(true)}
@@ -160,24 +160,24 @@ const ProfileCard = () => {
             <textarea
               value={bioValue}
               onChange={e => setBioValue(e.target.value)}
-              className="w-full p-3 text-base sm:text-lg rounded-lg bg-white/90 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 min-h-[120px] resize-y transition-all duration-200 text-gray-900 placeholder:text-gray-400"
+              className="w-full p-3 text-base sm:text-lg rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#7f5af0]/40 focus:border-[#7f5af0] min-h-[120px] resize-y transition-all duration-200 text-white placeholder:text-white/40"
               maxLength={160}
               placeholder="Cuenta algo sobre ti (máx 160 caracteres)"
             />
-            <div className="flex items-center justify-between text-base text-white">
+            <div className="flex items-center justify-between text-sm text-white/70 flex-wrap gap-3">
               <span className="font-medium">{bioValue.length}/160 caracteres</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setIsEditingBio(false)}
                   disabled={bioLoading}
-                  className="px-4 py-2 rounded-lg bg-neutral-200 hover:bg-neutral-300 text-neutral-800 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                  className="btn-secondary !px-4 !py-2 !rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={submitBio}
                   disabled={bioLoading}
-                  className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 font-medium transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md text-base"
+                  className="btn-primary !px-5 !py-2 !rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {bioLoading ? 'Guardando...' : 'Guardar'}
                 </button>
@@ -186,9 +186,9 @@ const ProfileCard = () => {
           </div>
         ) : (
           <div className="min-h-[80px]">
-            <p className="text-base sm:text-lg text-white leading-relaxed whitespace-pre-line">
+            <p className="text-base sm:text-lg text-white/80 leading-relaxed whitespace-pre-line">
               {user.bio || (
-                <span className="text-white italic">Sin biografía todavía. Haz clic en Editar para agregar una.</span>
+                <span className="text-white/60 italic">Sin biografía todavía. Haz clic en Editar para agregar una.</span>
               )}
             </p>
           </div>
@@ -196,27 +196,27 @@ const ProfileCard = () => {
       </section>
 
       {/* Datos técnicos: útil para debugging rápido o soporte. */}
-      <section className="bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-white/60 shadow-md font-sans">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4 font-serif">Datos técnicos</h3>
+      <section className="glass-panel p-6 border-white/10">
+        <h3 className="text-xl font-semibold text-white mb-4">Datos técnicos</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">ID de usuario</span>
+            <span className="text-xs font-semibold text-white/50 uppercase tracking-[0.3em] mb-1">ID de usuario</span>
             <span className="text-base text-white font-mono break-all">{user.id}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Cuenta creada</span>
-            <span className="text-base text-white">{formatDate(user.createdAt)}</span>
+            <span className="text-xs font-semibold text-white/50 uppercase tracking-[0.3em] mb-1">Cuenta creada</span>
+            <span className="text-base text-white/80">{formatDate(user.createdAt)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Último acceso</span>
-            <span className="text-base text-white">{formatDate((user as unknown as { lastAuthAt?: unknown }).lastAuthAt)}</span>
+            <span className="text-xs font-semibold text-white/50 uppercase tracking-[0.3em] mb-1">Último acceso</span>
+            <span className="text-base text-white/80">{formatDate((user as unknown as { lastAuthAt?: unknown }).lastAuthAt)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-white uppercase tracking-wide mb-1">Avatar</span>
+            <span className="text-xs font-semibold text-white/50 uppercase tracking-[0.3em] mb-1">Avatar</span>
             <span className="text-base text-white">
               {user.avatarFilename ? (
-                <span className="inline-flex items-center gap-1 text-white">
-                  <i className="bi bi-check-circle-fill text-emerald-600"></i>
+                <span className="inline-flex items-center gap-1 text-[#00e1d9]">
+                  <i className="bi bi-check-circle-fill"></i>
                   Configurado
                 </span>
               ) : (

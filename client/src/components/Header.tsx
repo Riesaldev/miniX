@@ -21,60 +21,81 @@ const Header = () => {
   const Logout = () => { ctx?.LogOut(); };
 
   // Subcomponente interno para encapsular badge de avatar.
+  const navLinks = [
+    { to: '/features', label: 'Features' },
+    { to: '/messages', label: 'Messages' },
+    { to: '/community', label: 'Community' },
+    { to: '/about', label: 'About' },
+  ];
+
   const AvatarBadge = () => (
-    <Link to="/profile" className="relative group inline-block w-10 h-10" aria-label="Ir al perfil">
+    <Link
+      to="/profile"
+      className="relative group inline-block w-11 h-11 rounded-full overflow-hidden shadow-lg ring-2 ring-white/10 hover:ring-[#00e1d9] transition-all duration-200"
+      aria-label="Ir al perfil"
+    >
       {avatar ? (
         <img
           src={avatar}
           alt="Perfil"
-          className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow cursor-pointer transition group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
       ) : (
-        // Placeholder con inicial si no hay avatar.
-        <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold ring-2 ring-white shadow cursor-pointer transition group-hover:scale-105 select-none">
+        <div className="w-full h-full bg-gradient-to-br from-[#7f5af0]/80 via-[#5b2be6] to-[#241551] text-white flex items-center justify-center font-semibold select-none">
           {initial}
         </div>
       )}
-      <span className="pointer-events-none absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-medium text-white bg-black/60 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">Perfil</span>
+      <span className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-medium text-white bg-black/70 px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition">
+        Perfil
+      </span>
     </Link>
   );
 
   return (
-    <header className="bg-emerald-400 w-full p-4">
-      <nav aria-label="Navegación principal">
-        <ul>
-          <div className="flex justify-between items-center text-gray-100 px-12">
-            <li className="hover:scale-115 transition-transform duration-200">
-              <Link to="/" aria-label="Ir a inicio">
-                <h1 className="text-3xl font-bold">
-                  <span className="text-red-700 font-extrabold text-4xl">/</span>
-                  <span className="text-xl ml-2">Mini</span>
-                  <span className="ml-2 text-4xl text-red-600 italic">X</span>
-                </h1>
+    <header className="sticky top-0 z-50 border-b border-white/5 bg-[#05060f]/80 backdrop-blur-2xl">
+      <nav aria-label="Navegación principal" className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
+        <Link to="/" aria-label="Ir a inicio" className="flex items-center gap-3 text-white">
+          <span className="flex items-center gap-2 text-2xl font-semibold tracking-wide">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#00e1d9] to-[#7f5af0] text-[#05060f] font-bold shadow-[0_10px_30px_rgba(0,225,217,0.25)]">
+              /
+            </span>
+            Mini<span className="text-[#00e1d9]">X</span>
+          </span>
+          <span className="hidden md:inline-flex text-xs font-medium uppercase tracking-[0.3em] text-white/50 px-3 py-1 rounded-full border border-white/10">
+            Social OS
+          </span>
+        </Link>
+
+        <ul className="hidden md:flex items-center gap-2 text-sm font-medium text-white/70">
+          {navLinks.map((link) => (
+            <li key={link.to}>
+              <Link to={link.to} className="pill-link">
+                {link.label}
               </Link>
             </li>
-            <section className="flex items-center gap-5">
-              {/* Render condicional según estado de autenticación. */}
-              {user ? (
-                <li className="flex items-center gap-3">
-                  <AvatarBadge />
-                  <button onClick={Logout} className="hover:text-red-600" aria-label="Cerrar sesión">Logout</button>
-                </li>
-              ) : (
-                <>
-                  <li className="hover:text-red-600">
-                    <Link to="/login">Login</Link>
-                  </li>
-                  <span aria-hidden="true">/</span>
-                  <li className="hover:text-red-600">
-                    <Link to="/register">Register</Link>
-                  </li>
-                </>
-              )}
-            </section>
-          </div>
+          ))}
         </ul>
+
+        <section className="flex items-center gap-3">
+          {user ? (
+            <>
+              <AvatarBadge />
+              <button onClick={Logout} className="btn-secondary !px-4 !py-2 text-sm" aria-label="Cerrar sesión">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="btn-secondary !px-4 !py-2 text-sm">
+                Login
+              </Link>
+              <Link to="/register" className="btn-primary !px-4 !py-2 text-sm">
+                Join MiniX
+              </Link>
+            </>
+          )}
+        </section>
       </nav>
     </header>
   );
